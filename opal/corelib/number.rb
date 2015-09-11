@@ -306,15 +306,7 @@ class Number < Numeric
         return 0;
       }
 
-      var result = 0,
-          value  = self < 0 ? ~self : self;
-
-      while (value != 0) {
-        result   += 1;
-        value  >>>= 1;
-      }
-
-      return result;
+      return Math.floor(Math.log(self) / Math.log(2) + 1)
     }
   end
 
