@@ -305,7 +305,7 @@ class Number < Numeric
       if (self === 0 || self === -1) {
         return 0;
       } else if (self < 0) {
-        return #{-self.bit_length}
+        return #{(-self).bit_length}
       }
 
       return Math.floor(Math.log(self) / Math.log(2) + 1)
