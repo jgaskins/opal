@@ -749,6 +749,14 @@ module Kernel
     }
   end
 
+  def freeze
+    `Object.freeze(self)`
+  end
+
+  def frozen?
+    `Object.isFrozen(self)`
+  end
+
   def hash
     __id__
   end
