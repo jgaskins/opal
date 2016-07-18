@@ -111,76 +111,22 @@ class Module
   alias attr attr_accessor
 
   def attr_reader(*names)
-    %x{
-      var proto = self.$$proto;
-
-      for (var i = names.length - 1; i >= 0; i--) {
-        var name = names[i],
-            id   = '$' + name,
-            ivar = Opal.ivar(name);
-
-        // the closure here is needed because name will change at the next
-        // cycle, I wish we could use let.
-        var body = (function(ivar) {
-          return function() {
-            if (this[ivar] == null) {
-              return nil;
-            }
-            else {
-              return this[ivar];
-            }
-          };
-        })(ivar);
-
-        // initialize the instance variable as nil
-        proto[ivar] = nil;
-
-        body.$$parameters = [];
-        body.$$arity = 0;
-
-        if (self.$$is_singleton) {
-          proto.constructor.prototype[id] = body;
-        }
-        else {
-          Opal.defn(self, id, body);
-        }
-      }
-    }
+    names.each do |name|
+      define_method name do
+        instance_variable_get "@#{name}"
+      end
+    end
 
     nil
   end
 
   def attr_writer(*names)
-    %x{
-      var proto = self.$$proto;
-
-      for (var i = names.length - 1; i >= 0; i--) {
-        var name = names[i],
-            id   = '$' + name + '=',
-            ivar = Opal.ivar(name);
-
-        // the closure here is needed because name will change at the next
-        // cycle, I wish we could use let.
-        var body = (function(ivar){
-          return function(value) {
-            return this[ivar] = value;
-          }
-        })(ivar);
-
-        body.$$parameters = [['req']];
-        body.$$arity = 1;
-
-        // initialize the instance variable as nil
-        proto[ivar] = nil;
-
-        if (self.$$is_singleton) {
-          proto.constructor.prototype[id] = body;
-        }
-        else {
-          Opal.defn(self, id, body);
-        }
-      }
-    }
+    names.each do |name|
+      define_method "#{name}=" do |value|
+        instance_variable_set "@#{name}", value
+        value
+      end
+    end
 
     nil
   end
